@@ -2,8 +2,8 @@ from pyglet.sprite import Sprite
 from general import between
 
 class SelectableSprite(Sprite):
-    def __init__(self, image, x, y):
-        Sprite.__init__(self, image, x, y)
+    def __init__(self, image, x, y, batch=None):
+        Sprite.__init__(self, image, x, y, batch=batch)
         self.selected=False
         print "derived"
         
@@ -13,7 +13,7 @@ class SelectableSprite(Sprite):
             self.scale=1
         else:
             self.selected=True
-            self.scale=1.1
+            self.scale=2
 
     def within(self,x,y):
         return between(x, self.x, self.x+self.width) and between(y, self.y, self.y+self.height)
