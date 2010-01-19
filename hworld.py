@@ -28,7 +28,10 @@ window=pyglet.window.Window()
 for i in range(num_stim):
     #need to add overlap detection?
     x,y=randint(0,window.width-image.width),randint(0,window.height-image.height)
-    stim.append(SelectableSprite(image,x,y,batch=batch))
+    s=SelectableSprite(image,x,y,batch=batch)
+    stim.append(s)
+    window.push_handlers(s.on_mouse_press)
+    window.push_handlers(s.on_mouse_drag)
     #generate labels for stimuli
     labels.append(pyglet.text.Label(str(i), font_name='Times New Roman', font_size=36, x=x, y=y, anchor_x='center', anchor_y='center', batch=batch))
 
@@ -48,15 +51,19 @@ def on_key_press(symbol, modifiers):
     elif symbol == key.ENTER:
         print 'the enter key'
 
-@window.event
-def on_mouse_press(x,y,button,modifiers):
-#if press is in unselected image;  select it
-#if press is in selected image; unselect it
-#if two images selected compare objects; unselect objects
-    if button == mouse.LEFT:
-        for ss in stim:
-            if ss.within(x,y):
-                ss.select()
+
+
+#@window.event
+#def on_mouse_press(x,y,button,modifiers):
+#    for ss in stim:
+#        ss.on_mouse_press(x,y,button,modifiers)
+# #if press is in unselected image;  select it
+# #if press is in selected image; unselect it
+# #if two images selected compare objects; unselect objects
+#     if button == mouse.LEFT:
+#         for ss in stim:
+#             if ss.within(x,y):
+#                 ss.select()
 
 
 
@@ -69,12 +76,13 @@ def on_draw():
     window.clear()
 #    label.draw()
 
-    batch.draw()
-
+#    batch.draw()
+    for s in stim:
+        s.draw()
     #add pause?
     #if two things are selected display the comparison of the two 
     [selected.append(s) for s in stim if s.selected and not s in selected]
-    print stim_order
+#    print stim_order
     if len(selected)==2:
         pyglet.text.Label(compare(), font_name='Times New Roman', font_size=36, x=10, y=10).draw()
         [s.select() for s in selected]
