@@ -3,9 +3,12 @@ from pyglet.window import key, mouse
 from general import between
 
 class SelectableSprite(Sprite):
-    def __init__(self, image, x, y, batch=None):
+    def __init__(self, image, x, y, batch=None, label=None):
         Sprite.__init__(self, image, x, y, batch=batch)
         self.selected=False
+        self.label=label
+
+
         print "derived"
         
     def select(self):
@@ -29,12 +32,15 @@ class SelectableSprite(Sprite):
                 
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
         if buttons & mouse.LEFT:
-            if self.within(x,y):
+            if self.within(x,y) and self.selected:
                 self.x=x-self.width/2
                 self.y=y-self.height/2
+                self.label.x=x
+                self.label.y=y
 
     def draw(self):
         Sprite.draw(self)
+        self.label.draw()
         #draw border around the image if selected
 #        if self.selected:
 #            self.drawBorder()
