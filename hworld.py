@@ -24,7 +24,7 @@ window=pyglet.window.Window()
 #temporary solution for displaying 
 
 
-#generate the stimulus
+#generate the stimuli
 for i in range(num_stim):
     #need to add overlap detection?
     x,y=randint(0,window.width-image.width),randint(0,window.height-image.height)
@@ -43,31 +43,6 @@ sprite=Sprite(image,60, 60)
 ss=SelectableSprite(image,60,60)
 
 @window.event
-def on_key_press(symbol, modifiers):
-    if symbol == key.A:
-        print 'A key was pressed'
-    elif symbol == key.LEFT:
-        print 'left'
-    elif symbol == key.ENTER:
-        print 'the enter key'
-
-
-
-#@window.event
-#def on_mouse_press(x,y,button,modifiers):
-#    for ss in stim:
-#        ss.on_mouse_press(x,y,button,modifiers)
-# #if press is in unselected image;  select it
-# #if press is in selected image; unselect it
-# #if two images selected compare objects; unselect objects
-#     if button == mouse.LEFT:
-#         for ss in stim:
-#             if ss.within(x,y):
-#                 ss.select()
-
-
-
-@window.event
 def on_draw():
     global display
     if display:
@@ -76,9 +51,9 @@ def on_draw():
     window.clear()
 #    label.draw()
 
-#    batch.draw()
-    for s in stim:
-        s.draw()
+    batch.draw()
+#    for s in stim:
+#        s.draw()
     #add pause?
     #if two things are selected display the comparison of the two 
     [selected.append(s) for s in stim if s.selected and not s in selected]
