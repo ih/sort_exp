@@ -67,8 +67,6 @@ def on_draw():
         time.sleep(3)
         display=False
     window.clear()
-
-
 #    batch.draw()
     for lst in stim:
         for pos,obj in lst:
@@ -78,38 +76,57 @@ def on_draw():
                 head_pos,head=lst[0]
                 lst_indx=stim.index(lst)
                 if pos < head_pos and (lst_indx==0 or not inside((pos,obj),stim[lst_indx-1])):
-                    pdb.set_trace()
+#                    pdb.set_trace()
                     #create a list and add to front of stim
+                    remove_greater((pos,obj),lst_indx)
                     small_lst=new_lst((pos,obj),lst)
                     stim.insert(0,small_lst)
-#put this in                    stim.sort()
+                    stim.sort()
                     obj.selected=False
+
                 elif not pos<head_pos and (lst_indx==len(stim)-1 or not inside((pos,obj),stim[lst_indx+1])):
-                    pdb.set_trace()
+#                    pdb.set_trace()
                     #create a list and add to end of stim
+                    remove_less((pos,obj),lst_indx)
                     small_lst=new_lst((pos,obj),lst)
                     stim.append(small_lst)
-#put this in                    stim.sort()
+                    stim.sort()
                     obj.selected=False
+
                 elif pos<head_pos:
-                    pdb.set_trace()
+#                    pdb.set_trace()
                     #remove obj from list and all lists after
-                    for l in stim[lst_indx:]:
-                        try:
-                            l.remove((pos,obj))
-                        except ValueError:
-                            None
+                    remove_greater((pos,obj),lst_indx)
                 else:
-                    pdb.set_trace()
+#                    pdb.set_trace()
                     #remove obj from list and all lists before
-                    for l in stim[0:lst_indx+1]:
-                        try:
-                            l.remove((pos,obj))
-                        except ValueError:
-                            None
+                    remove_less((pos,obj),lst_indx)
     set_stim_pos()
     print stim
     print stim_order
+
+def remove_less((pos,obj),lst_indx):
+    for l in stim[0:lst_indx+1]:
+        for p,o in l:
+            if p==pos:
+                l.remove((p,o))
+            
+#         try:
+#             l.remove((pos,obj))
+#         except ValueError:
+#             None
+
+def remove_greater((pos,obj),lst_indx):
+    for l in stim[lst_indx:]:
+        for p,o in l:
+            if p==pos:
+                l.remove((p,o))
+
+#     for l in stim[lst_indx:]:
+#         try:
+#             l.remove((pos,obj))
+#         except ValueError:
+#             None
 
 def inside((pos,obj),lst):
     for p,o in lst:
@@ -128,7 +145,7 @@ def set_stim_pos():
 
 def new_lst((pos,obj),lst):
 #    pdb.set_trace()
-    lst.remove((pos,obj))
+#    lst.remove((pos,obj))
     #copy the list
     lst_copy=[]
     for (lpos,lobj) in lst[1:]:

@@ -19,7 +19,8 @@ selected=[]
 stim=[[]]
 labels=[]
 #maybe make this a shape with random color
-image=pyglet.image.load('ball.gif')
+
+image=[pyglet.image.load('b'+str(i)+'.gif') for i in range(num_stim)]
 window=pyglet.window.Window()
 
 
@@ -54,7 +55,7 @@ def y_pos(item_num):
     #create a single list containing all the elements; initially set position to origin
 for i in range(num_stim):
     label=pyglet.text.Label(str(i), font_name='Times New Roman', font_size=36, x=x_pos(0), y=y_pos(i), anchor_x='center', anchor_y='center', batch=batch)
-    (pos,s)=(stim_order[i],SelectableSprite(image,x_pos(0),y_pos(i),batch=batch,label=label))
+    (pos,s)=(stim_order[i],SelectableSprite(image[i],x_pos(0),y_pos(i),batch=batch,label=label))
     stim[0].append((pos,s))
     window.push_handlers(s.on_mouse_press)
     window.push_handlers(s.on_mouse_drag)    
@@ -110,23 +111,12 @@ def remove_less((pos,obj),lst_indx):
         for p,o in l:
             if p==pos:
                 l.remove((p,o))
-            
-#         try:
-#             l.remove((pos,obj))
-#         except ValueError:
-#             None
 
 def remove_greater((pos,obj),lst_indx):
     for l in stim[lst_indx:]:
         for p,o in l:
             if p==pos:
                 l.remove((p,o))
-
-#     for l in stim[lst_indx:]:
-#         try:
-#             l.remove((pos,obj))
-#         except ValueError:
-#             None
 
 def inside((pos,obj),lst):
     for p,o in lst:
@@ -145,12 +135,11 @@ def set_stim_pos():
 
 def new_lst((pos,obj),lst):
 #    pdb.set_trace()
-#    lst.remove((pos,obj))
     #copy the list
     lst_copy=[]
     for (lpos,lobj) in lst[1:]:
         label=pyglet.text.Label(lobj.label.text, font_name='Times New Roman', font_size=36, x=x_pos(0), y=y_pos(lst.index((lpos,lobj))), anchor_x='center', anchor_y='center', batch=batch)
-        s=SelectableSprite(image,x_pos(0),y_pos(lst.index((lpos,lobj))),batch=batch,label=label)
+        s=SelectableSprite(lobj.image,x_pos(0),y_pos(lst.index((lpos,lobj))),batch=batch,label=label)
         lst_copy.append((lpos,s))
         window.push_handlers(s.on_mouse_press)
         window.push_handlers(s.on_mouse_drag)    
