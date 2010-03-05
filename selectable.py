@@ -7,8 +7,6 @@ class SelectableSprite(Sprite):
         Sprite.__init__(self, image, x, y, batch=batch)
         self.selected=False
         self.label=label
-
-
         print "derived"
         
     def select(self):
@@ -28,7 +26,8 @@ class SelectableSprite(Sprite):
 #if two images selected compare objects; unselect objects
         if button == mouse.LEFT:
             if self.within(x,y):
-                self.select()
+                self.selected=True
+#                self.select()
                 
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
         if buttons & mouse.LEFT:

@@ -1,0 +1,174 @@
+import pyglet
+import pdb
+import time
+import textinput
+import copy
+from random import randint,shuffle
+from itertools import permutations
+from selectable import SelectableSprite
+from pyglet.sprite import Sprite
+from pyglet.window import key, mouse
+
+####uncomment for debugging
+#window.push_handlers(pyglet.window.event.WindowEventLogger())
+
+batch=pyglet.graphics.Batch()
+display=False
+num_stim=10
+selected=[]
+stim=[[]]
+labels=[]
+#maybe make this a shape with random color
+image=pyglet.image.load('ball.gif')
+window=pyglet.window.Window()
+
+
+
+#assign an order to the stimuli; the index is the item label and the value is the order position
+stim_order=range(num_stim)
+shuffle(stim_order)
+
+print stim_order
+#positioning functions
+
+def even_spacing(num_objs,boundary):
+    """returns an array of evenly spaced positions for the passed number of objects from 0,boundary; it should be noted the intervals must be integers"""
+    if num_objs == 1:
+        return [boundary/2]
+    else:
+        interval=boundary/(num_objs+1)
+        positions=[i for i in range(0,boundary,interval)]
+        return positions[1:num_objs+1]
+
+
+#given the list within data returns the x coordinate which applies to all the items in that list
+def x_pos(list_num):
+    return even_spacing(len(stim), window.width)[list_num]
+
+def y_pos(item_num):
+    return even_spacing(num_stim, window.height)[item_num]
+    
+#data is a list of lists where each list contains selectablesprites
+#generate the stimuli initially a single list
+    
+    #create a single list containing all the elements; initially set position to origin
+for i in range(num_stim):
+    label=pyglet.text.Label(str(i), font_name='Times New Roman', font_size=36, x=x_pos(0), y=y_pos(i), anchor_x='center', anchor_y='center', batch=batch)
+    (pos,s)=(stim_order[i],SelectableSprite(image,x_pos(0),y_pos(i),batch=batch,label=label))
+    stim[0].append((pos,s))
+    window.push_handlers(s.on_mouse_press)
+    window.push_handlers(s.on_mouse_drag)    
+
+
+@window.event
+def on_draw():
+    global display
+    if display:
+        time.sleep(3)
+        display=False
+    window.clear()
+
+
+#    batch.draw()
+    for lst in stim:
+        for pos,obj in lst:
+            obj.draw()
+            if obj.selected:
+#add list/remove obj from lists based on the 4 different cases
+                head_pos,head=lst[0]
+                lst_indx=stim.index(lst)
+                if pos < head_pos and (lst_indx==0 or not inside((pos,obj),stim[lst_indx-1])):
+                    pdb.set_trace()
+                    #create a list and add to front of stim
+                    small_lst=new_lst((pos,obj),lst)
+                    stim.insert(0,small_lst)
+#put this in                    stim.sort()
+                    obj.selected=False
+                elif not pos<head_pos and (lst_indx==len(stim)-1 or not inside((pos,obj),stim[lst_indx+1])):
+                    pdb.set_trace()
+                    #create a list and add to end of stim
+                    small_lst=new_lst((pos,obj),lst)
+                    stim.append(small_lst)
+#put this in                    stim.sort()
+                    obj.selected=False
+                elif pos<head_pos:
+                    pdb.set_trace()
+                    #remove obj from list and all lists after
+                    for l in stim[lst_indx:]:
+                        try:
+                            l.remove((pos,obj))
+                        except ValueError:
+                            None
+                else:
+                    pdb.set_trace()
+                    #remove obj from list and all lists before
+                    for l in stim[0:lst_indx+1]:
+                        try:
+                            l.remove((pos,obj))
+                        except ValueError:
+                            None
+    set_stim_pos()
+    print stim
+    print stim_order
+
+def inside((pos,obj),lst):
+    for p,o in lst:
+        if p==pos:
+            return True
+    return False
+        
+
+def set_stim_pos():
+    for lst in stim:
+        for (pos,obj) in lst:
+            obj.x=obj.label.x=x_pos(stim.index(lst))
+            obj.y=obj.label.y=y_pos(lst.index((pos,obj)))
+#    pdb.set_trace()
+            
+
+def new_lst((pos,obj),lst):
+#    pdb.set_trace()
+    lst.remove((pos,obj))
+    #copy the list
+    lst_copy=[]
+    for (lpos,lobj) in lst[1:]:
+        label=pyglet.text.Label(lobj.label.text, font_name='Times New Roman', font_size=36, x=x_pos(0), y=y_pos(lst.index((lpos,lobj))), anchor_x='center', anchor_y='center', batch=batch)
+        s=SelectableSprite(image,x_pos(0),y_pos(lst.index((lpos,lobj))),batch=batch,label=label)
+        lst_copy.append((lpos,s))
+        window.push_handlers(s.on_mouse_press)
+        window.push_handlers(s.on_mouse_drag)    
+
+    lst_copy.insert(0,(pos,obj))
+    return lst_copy
+
+pyglet.app.run()
+
+# def less(a,b):
+#     pdb.set_trace()
+#     return stim_order.index(a) < stim_order.index(b)
+
+
+
+# def unselect_all():
+#     for lst in stim:
+#         for id,obj in lst:
+#             obj.selected=False
+
+
+# def compare():
+#     """compares items in selected and returns a string 'a<b' """
+#     i1=selected[0]
+#     i2=selected[1]
+#     if stim_order.index(i1) < stim_order.index(i2) and selected:
+#     if stim_order.index(i1) < stim_order.index(i2):
+#         return str(i1)+"<"+str(i2)
+#     else:
+#         return str(i2)+"<"+str(i1)
+
+# def sorted():
+#     comparisons=[stim[stim_order[i]].x<=stim[stim_order[i+1]].x for i in range(num_stim-1)]
+# #    pdb.set_trace()
+#     return reduce(lambda x,y: x and y, comparisons)
+
+
+
