@@ -23,8 +23,11 @@ labels=[]
 image=[pyglet.image.load('b'+str(i)+'.gif') for i in range(num_stim)]
 window=pyglet.window.Window()
 
+#keep track of the choices of the user
+userlog=[]
 
-
+#turn on/off labels; eventually set this w/ command line options
+uselabels=False
 #assign an order to the stimuli; the index is the item label and the value is the order position
 stim_order=range(num_stim)
 shuffle(stim_order)
@@ -72,7 +75,7 @@ def on_draw():
     for lst in stim:
         for pos,obj in lst:
             obj.draw()
-            if obj.selected:
+            if obj.selected and lst.index((pos,obj))!=0:
 #add list/remove obj from lists based on the 4 different cases
                 head_pos,head=lst[0]
                 lst_indx=stim.index(lst)
@@ -102,6 +105,7 @@ def on_draw():
 #                    pdb.set_trace()
                     #remove obj from list and all lists before
                     remove_less((pos,obj),lst_indx)
+                userlog.append(copy.copy(stim))
     set_stim_pos()
     print stim
     print stim_order

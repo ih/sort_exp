@@ -39,7 +39,7 @@ class SelectableSprite(Sprite):
 
     def draw(self):
         Sprite.draw(self)
-        self.label.draw()
+        #self.label.draw()
         #draw border around the image if selected
 #        if self.selected:
 #            self.drawBorder()
