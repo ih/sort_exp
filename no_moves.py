@@ -14,6 +14,7 @@ from pyglet.window import key, mouse
 
 batch=pyglet.graphics.Batch()
 display=False
+
 num_stim=10
 selected=[]
 stim=[[]]
@@ -25,16 +26,9 @@ window=pyglet.window.Window()
 
 #keep track of the choices of the user
 userlog=[]
-
-#turn on/off labels; eventually set this w/ command line options
-uselabels=False
-#assign an order to the stimuli; the index is the item label and the value is the order position
 stim_order=range(num_stim)
-shuffle(stim_order)
 
-print stim_order
 #positioning functions
-
 def even_spacing(num_objs,boundary):
     """returns an array of evenly spaced positions for the passed number of objects from 0,boundary; it should be noted the intervals must be integers"""
     if num_objs == 1:
@@ -51,17 +45,30 @@ def x_pos(list_num):
 
 def y_pos(item_num):
     return even_spacing(num_stim, window.height)[item_num]
-    
+
+
 #data is a list of lists where each list contains selectablesprites
 #generate the stimuli initially a single list
     
     #create a single list containing all the elements; initially set position to origin
-for i in range(num_stim):
-    label=pyglet.text.Label(str(i), font_name='Times New Roman', font_size=36, x=x_pos(0), y=y_pos(i), anchor_x='center', anchor_y='center', batch=batch)
-    (pos,s)=(stim_order[i],SelectableSprite(image[i],x_pos(0),y_pos(i),batch=batch,label=label))
-    stim[0].append((pos,s))
-    window.push_handlers(s.on_mouse_press)
-    window.push_handlers(s.on_mouse_drag)    
+def init_episode():
+#assign an order to the stimuli; the index is the item label and the value is the order position
+    userlog.append([])
+    global stim_order,stim
+    stim=[[]]
+    shuffle(stim_order)
+    print stim_order
+
+    for i in range(num_stim):
+        label=pyglet.text.Label(str(i), font_name='Times New Roman', font_size=36, x=x_pos(0), y=y_pos(i), anchor_x='center', anchor_y='center', batch=batch)
+        (pos,s)=(stim_order[i],SelectableSprite(image[i],x_pos(0),y_pos(i),batch=batch,label=label))
+        stim[0].append((pos,s))
+        window.push_handlers(s.on_mouse_press)
+        window.push_handlers(s.on_mouse_drag)    
+
+init_episode()
+
+
 
 
 @window.event
@@ -105,7 +112,15 @@ def on_draw():
 #                    pdb.set_trace()
                     #remove obj from list and all lists before
                     remove_less((pos,obj),lst_indx)
-                userlog.append(copy.copy(stim))
+                userlog[-1].append(copy.copy(stim))
+                #start a new episode if finished
+    if len(stim)==num_stim:
+        for e in userlog:
+            i=userlog.index(e)
+            pyglet.text.Label("Episode"+str(i)+':'+str(len(e)), font_name='Times New Roman', font_size=40, x=window.width/2, y=i*40).draw()
+        display=True
+        print "SORTED"
+        init_episode()
     set_stim_pos()
     print stim
     print stim_order
