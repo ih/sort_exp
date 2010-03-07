@@ -15,14 +15,17 @@ from pyglet.window import key, mouse
 batch=pyglet.graphics.Batch()
 display=False
 
-num_stim=10
+num_stim=20
 selected=[]
 stim=[[]]
 labels=[]
 #maybe make this a shape with random color
 
-image=[pyglet.image.load('b'+str(i)+'.gif') for i in range(num_stim)]
+image=pyglet.image.load('stim.gif')
 window=pyglet.window.Window()
+#scale the image based on the number of stimuli and the size of the window
+
+image_scale=(min(window.width,window.height)/num_stim)/(image.width*1.0)
 
 #keep track of the choices of the user
 userlog=[]
@@ -61,7 +64,12 @@ def init_episode():
 
     for i in range(num_stim):
         label=pyglet.text.Label(str(i), font_name='Times New Roman', font_size=36, x=x_pos(0), y=y_pos(i), anchor_x='center', anchor_y='center', batch=batch)
-        (pos,s)=(stim_order[i],SelectableSprite(image[i],x_pos(0),y_pos(i),batch=batch,label=label))
+        ssprite=SelectableSprite(image,x_pos(0),y_pos(i),batch=batch,label=label)
+        ssprite.color=(randint(0,255),randint(0,255),randint(0,255))
+
+        ssprite.scale=image_scale
+
+        (pos,s)=(stim_order[i],ssprite)
         stim[0].append((pos,s))
         window.push_handlers(s.on_mouse_press)
         window.push_handlers(s.on_mouse_drag)    
@@ -159,6 +167,8 @@ def new_lst((pos,obj),lst):
     for (lpos,lobj) in lst[1:]:
         label=pyglet.text.Label(lobj.label.text, font_name='Times New Roman', font_size=36, x=x_pos(0), y=y_pos(lst.index((lpos,lobj))), anchor_x='center', anchor_y='center', batch=batch)
         s=SelectableSprite(lobj.image,x_pos(0),y_pos(lst.index((lpos,lobj))),batch=batch,label=label)
+        s.scale=lobj.scale
+        s.color=lobj.color
         lst_copy.append((lpos,s))
         window.push_handlers(s.on_mouse_press)
         window.push_handlers(s.on_mouse_drag)    
