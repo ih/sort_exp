@@ -1,8 +1,10 @@
 import pyglet
 import pdb
 import time
+import datetime
 import textinput
 import copy
+import pickle
 from random import randint,shuffle
 from itertools import permutations
 from selectable import SelectableSprite
@@ -15,7 +17,7 @@ from pyglet.window import key, mouse
 batch=pyglet.graphics.Batch()
 display=False
 
-num_stim=20
+num_stim=5
 selected=[]
 stim=[[]]
 labels=[]
@@ -28,7 +30,11 @@ window=pyglet.window.Window()
 image_scale=(min(window.width,window.height)/num_stim)/(image.width*1.0)
 
 #keep track of the choices of the user
+fname=str(datetime.datetime.now())+'.dat'
+logfile=open(fname,'w')
 userlog=[]
+
+
 stim_order=range(num_stim)
 
 #positioning functions
@@ -128,6 +134,7 @@ def on_draw():
             pyglet.text.Label("Episode"+str(i)+':'+str(len(e)), font_name='Times New Roman', font_size=40, x=window.width/2, y=i*40).draw()
         display=True
         print "SORTED"
+        pickle.dump(userlog,fname)
         init_episode()
     set_stim_pos()
     print stim
