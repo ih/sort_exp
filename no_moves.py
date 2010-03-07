@@ -18,12 +18,15 @@ batch=pyglet.graphics.Batch()
 display=False
 
 num_stim=5
+num_episodes=2
 selected=[]
+#stim corresponds to the columns the user sees
 stim=[[]]
 labels=[]
 #maybe make this a shape with random color
 
 image=pyglet.image.load('stim.gif')
+
 window=pyglet.window.Window()
 #scale the image based on the number of stimuli and the size of the window
 
@@ -31,7 +34,7 @@ image_scale=(min(window.width,window.height)/num_stim)/(image.width*1.0)
 
 #keep track of the choices of the user
 fname=str(datetime.datetime.now())+'.dat'
-logfile=open(fname,'w')
+
 userlog=[]
 
 
@@ -74,6 +77,7 @@ def init_episode():
         ssprite.color=(randint(0,255),randint(0,255),randint(0,255))
 
         ssprite.scale=image_scale
+
 
         (pos,s)=(stim_order[i],ssprite)
         stim[0].append((pos,s))
@@ -126,7 +130,7 @@ def on_draw():
 #                    pdb.set_trace()
                     #remove obj from list and all lists before
                     remove_less((pos,obj),lst_indx)
-                userlog[-1].append(copy.copy(stim))
+                userlog[-1].append(pickelize(stim))
                 #start a new episode if finished
     if len(stim)==num_stim:
         for e in userlog:
@@ -134,11 +138,21 @@ def on_draw():
             pyglet.text.Label("Episode"+str(i)+':'+str(len(e)), font_name='Times New Roman', font_size=40, x=window.width/2, y=i*40).draw()
         display=True
         print "SORTED"
-        pickle.dump(userlog,fname)
-        init_episode()
+        logfile=open(fname,'w')
+        pickle.dump(userlog,logfile)
+        logfile.close()        
+        if len(userlog)==num_episodes:
+            pyglet.text.Label("The End", font_name='Times New Roman', font_size=40, x=window.width/2, y=window.height/2).draw()
+        else:
+            init_episode()
     set_stim_pos()
     print stim
     print stim_order
+
+def pickelize(stimulus):
+    """copy the stimulus but replace the selectable sprite with the object number"""
+    return [[(pos,int(s.label.text)) for pos,s in col] for col in stimulus]
+
 
 def remove_less((pos,obj),lst_indx):
     for l in stim[0:lst_indx+1]:
