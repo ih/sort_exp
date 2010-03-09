@@ -17,8 +17,8 @@ from pyglet.window import key, mouse
 batch=pyglet.graphics.Batch()
 display=False
 
-num_stim=5
-num_episodes=2
+num_stim=20
+num_episodes=10
 selected=[]
 #stim corresponds to the columns the user sees
 stim=[[]]
